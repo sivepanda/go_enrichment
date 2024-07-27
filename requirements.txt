@@ -1,0 +1,7 @@
+biopython
+pandas
+scipy
+statsmodels
+requests
+goatools
+
