@@ -1,1 +1,5 @@
 /go_enr_env
+/__pycache
+/go_enrichment/__pycache__
+/tests/__pycache__
+*.pyc

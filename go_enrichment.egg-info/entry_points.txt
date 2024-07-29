@@ -1,0 +1,3 @@
+[console_scripts]
+run-enrichment = go_enrichment.go_enrichment:main
+
