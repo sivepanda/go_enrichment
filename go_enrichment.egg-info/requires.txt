@@ -1,6 +1,2 @@
-biopython
-goatools
 pandas
-requests
 scipy
-statsmodels

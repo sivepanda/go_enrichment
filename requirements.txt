@@ -1,7 +1,4 @@
-biopython
+numpy<2
 pandas
+mygene
 scipy
-statsmodels
-requests
-goatools
-

@@ -1,11 +1,9 @@
 README.md
 setup.py
-go_enrichment/__init__.py
-go_enrichment/fetch_data.py
-go_enrichment/go_enrichment.py
 go_enrichment.egg-info/PKG-INFO
 go_enrichment.egg-info/SOURCES.txt
 go_enrichment.egg-info/dependency_links.txt
 go_enrichment.egg-info/entry_points.txt
 go_enrichment.egg-info/requires.txt
 go_enrichment.egg-info/top_level.txt
+tests/test_enrichment.py
