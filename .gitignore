@@ -3,4 +3,6 @@
 /go_enrichment/__pycache__
 /tests/__pycache__
 *.pyc
+*egg-info/
 /env
+*.csv
