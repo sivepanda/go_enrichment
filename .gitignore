@@ -7,3 +7,5 @@
 *egg-info/
 /env
 *.csv
+run.sh
+*.log
