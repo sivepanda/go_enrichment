@@ -9,6 +9,25 @@ from tqdm import tqdm
 # This program uses the mygene.info API, an example you can visit to see usual output of this is below
 # https://mygene.info/v3/query?q=go:*&fields=go,genomic_pos_hg19.chr&fetch_all=TRUE
 
+def process_chromosome(go_dat, go_info, id, chr):
+    # for chr in chromosomes:
+    table = generate_contingency_table(go_dat, id , chr)
+    progress_bar.update(1)
+    oddsratio, p_value = fisher_exact(table)
+    result = ({
+        'chromosome': chr,
+        'go_id': id,
+        'go_name': go_info[id]['term'],
+        'top lvl': go_info[id]['category'],
+        'GO: Y; Chr :Y': table[0][0],
+        'GO: N; Chr :Y': table[0][1],
+        'GO: Y; Chr :N': table[1][0],
+        'GO: N; Chr :N': table[1][1],
+        'odds_ratio': oddsratio,
+        'p-value': p_value
+    })
+    return result
+
 def enrichment_analysis(go_data, num_points):
     go_progress_bar = tqdm(total=num_points, desc=f'Getting GO Data')
     
@@ -50,22 +69,15 @@ def enrichment_analysis(go_data, num_points):
     print("Generating Contingency tables")
     for id in go_ids:
         progress_bar = tqdm(total=len(chromosomes), desc=f'Generating Contingency Tables for GO Category')
-        for chr in chromosomes:
-            table = generate_contingency_table(go_dat, id , chr)
-            progress_bar.update(1)
-            oddsratio, p_value = fisher_exact(table)
-            results.append({
-                'chromosome': chr,
-                'go_id': id,
-                'go_name': go_info[id]['term'],
-                'top lvl': go_info[id]['category'],
-                'GO: Y; Chr :Y': table[0][0],
-                'GO: N; Chr :Y': table[0][1],
-                'GO: Y; Chr :N': table[1][0],
-                'GO: N; Chr :N': table[1][1],
-                'odds_ratio': oddsratio,
-                'p-value': p_value
-            })
+         with concurrent.futures.ThreadPoolExecutor() as executor:
+                for id in go_ids:
+                    progress_bar = tqdm(total=len(chromosomes), desc=f'Generating Contingency Tables for GO Category {id}')
+                    # Create a list of futures
+                    futures = {executor.submit(process_chromosome, go_dat, go_info, id, chr): chr for chr in chromosomes}
+                    for future in concurrent.futures.as_completed(futures):
+                        result = future.result()
+                        results.append(result)
+                        progress_bar.update(1)   
     
     return pd.DataFrame(results)
 
