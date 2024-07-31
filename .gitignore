@@ -1,4 +1,5 @@
 /go_enr_env
+/build
 /__pycache
 /go_enrichment/__pycache__
 /tests/__pycache__
