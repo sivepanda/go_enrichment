@@ -55,12 +55,16 @@ def enrichment_analysis(go_data, num_points):
             progress_bar.update(1)
             oddsratio, p_value = fisher_exact(table)
             results.append({
-                'go_id': id,
-                'go_category': go_info[id]['category'],
-                'go_name': go_info[id]['term'],
                 'chromosome': chr,
+                'go_id': id,
+                'go_name': go_info[id]['term'],
+                'top lvl': go_info[id]['category'],
+                'GO: Y; Chr :Y': table[0][0],
+                'GO: N; Chr :Y': table[0][1],
+                'GO: Y; Chr :Y': table[1][0],
+                'GO: N; Chr :N': table[1][1],
                 'odds_ratio': oddsratio,
-                'p_value': p_value
+                'p-value': p_value
             })
     
     return pd.DataFrame(results)
