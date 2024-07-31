@@ -61,7 +61,7 @@ def enrichment_analysis(go_data, num_points):
                 'top lvl': go_info[id]['category'],
                 'GO: Y; Chr :Y': table[0][0],
                 'GO: N; Chr :Y': table[0][1],
-                'GO: Y; Chr :Y': table[1][0],
+                'GO: Y; Chr :N': table[1][0],
                 'GO: N; Chr :N': table[1][1],
                 'odds_ratio': oddsratio,
                 'p-value': p_value
