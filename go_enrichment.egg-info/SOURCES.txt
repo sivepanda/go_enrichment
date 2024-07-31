@@ -1,9 +1,0 @@
-README.md
-setup.py
-go_enrichment.egg-info/PKG-INFO
-go_enrichment.egg-info/SOURCES.txt
-go_enrichment.egg-info/dependency_links.txt
-go_enrichment.egg-info/entry_points.txt
-go_enrichment.egg-info/requires.txt
-go_enrichment.egg-info/top_level.txt
-tests/test_enrichment.py
