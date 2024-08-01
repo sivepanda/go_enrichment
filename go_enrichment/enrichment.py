@@ -10,8 +10,8 @@ import concurrent.futures
 # This program uses the mygene.info API, an example you can visit to see usual output of this is below
 # https://mygene.info/v3/query?q=go:*&fields=go,genomic_pos_hg19.chr&fetch_all=TRUE
 
+# Completes a Fisher Exact test on a GO Category and the chromosomes it is found in
 def process_chromosome(go_dat, go_info, id, chr):
-    # for chr in chromosomes:
     table = generate_contingency_table(go_dat, id , chr)
     oddsratio, p_value = fisher_exact(table)
     result = ({
@@ -28,23 +28,38 @@ def process_chromosome(go_dat, go_info, id, chr):
     })
     return result
 
+# Runs the enrichment analysis
 def enrichment_analysis(go_data, num_points):
-    go_progress_bar = tqdm(total=num_points, desc=f'Getting GO Data')
+    possible_chr = values = [str(i) for i in range(1, 24)] + ['X', 'Y']
+    go_progress_bar = tqdm(total=num_points, desc=f'Getting GO Data') # Progress bar for fetching GO data.
     
+    go_info = {} # Dictionary that has the GO ID as the Key and the Term and Category within it
+    go_dat = [] # To preserve the GO data after the user limit has been reached (object is destroyed when the datastream ends)
     results = []
-    go_dat = []
     go_ids = set()
     chromosomes = set()
-    go_info = {} # Dictionary that has the GO ID as the Key and the Term and Category within it
     n = 0
     
     # Collect all unique GO categories and chromosomes from input data stream
     for hit in go_data:
         go_progress_bar.update(1)
         n += 1
+        
+        # Exit when max is hit
         if n == num_points: 
             go_data.close()
             break
+
+        # Do not process when chromosome is not a known one 1-23, X, Y
+        if 'genomic_pos_hg19' in hit:
+            if len(hit['genomic_pos_hg19']) > 1:
+                if not ( str(hit['genomic_pos_hg19'][0]['chr']) in possible_chr):
+                    n -= 1
+                    continue
+            else:
+                if not ( str(hit['genomic_pos_hg19']['chr']) in possible_chr ):
+                    n -= 1
+                    continue
         
         go_dat.append(hit)
         
