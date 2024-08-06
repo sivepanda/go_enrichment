@@ -4,6 +4,7 @@ from scipy.stats import fisher_exact
 from go_enrichment.utils import generate_contingency_table
 from tqdm import tqdm
 import concurrent.futures
+import numpy as np
 
 
 
@@ -47,22 +48,33 @@ def enrichment_analysis(go_data, num_points):
         
         # Exit when max is hit
         if n == num_points: 
+            go_dat_np = np.array(go_dat)
+            np.save('./go_data.npy', go_dat_np)
             go_data.close()
             break
+
+        if n % 10 == 0: 
+            go_dat_np = np.array(go_dat)
+            np.save('./go_data.npy', go_dat_np)
 
         # Do not process when chromosome is not a known one 1-23, X, Y
         if 'genomic_pos_hg19' in hit:
             if len(hit['genomic_pos_hg19']) > 1:
                 if not ( str(hit['genomic_pos_hg19'][0]['chr']) in possible_chr):
-                    n -= 1
-                    continue
+                    if ( str(hit['genomic_pos_hg19'][1]['chr']) in possible_chr ):
+                        hit['genomic_pos_hg19'][0]['chr'] = hit['genomic_pos_hg19'][1]['chr']
+                    else:
+                        continue
             else:
                 if not ( str(hit['genomic_pos_hg19']['chr']) in possible_chr ):
-                    n -= 1
                     continue
         
         go_dat.append(hit)
-        
+
+    
+
+    print(len(go_dat))
+    for hit in go_dat:
         if 'genomic_pos_hg19' in hit:
             if len(hit['genomic_pos_hg19']) > 1:
                 chromosomes.add(hit['genomic_pos_hg19'][0]['chr'])
@@ -80,7 +92,7 @@ def enrichment_analysis(go_data, num_points):
                 go_info[hit['go'][aspect]['id']] = { 'category': aspect, 'term':  hit['go'][aspect]['term'] }
 
 
-
+    num_processed = 0
     print("Generating Contingency tables")
     with concurrent.futures.ThreadPoolExecutor() as executor:
        for id in go_ids:
@@ -88,9 +100,12 @@ def enrichment_analysis(go_data, num_points):
            # Create a list of futures
            futures = {executor.submit(process_chromosome, go_dat, go_info, id, chr): chr for chr in chromosomes}
            for future in concurrent.futures.as_completed(futures):
-               result = future.result()
-               results.append(result)
-               progress_bar.update(1)   
+                result = future.result()
+                results.append(result)
+                if num_processed % 100 == 0:
+                    results_np = np.array(results)
+                    np.save('./results.npy', results_np)
+                progress_bar.update(1)   
     
     return pd.DataFrame(results)
 

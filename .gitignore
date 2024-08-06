@@ -2,6 +2,7 @@
 /build
 /__pycache
 /logs
+/outputs
 /env
 /tests/__pycache__
 /go_enrichment/__pycache__
@@ -11,4 +12,5 @@
 *.csv
 *.log
 *.swp
+*.npy
 run.sh

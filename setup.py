@@ -11,6 +11,7 @@ setup(
         'pandas',
         'mygene',
         'scipy',
+        'numpy',
     ],
     entry_points={
         'console_scripts': [
